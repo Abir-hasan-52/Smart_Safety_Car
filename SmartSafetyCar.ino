@@ -235,3 +235,33 @@ void handleBluetooth(char cmd)
         break;
     }
 }
+
+void moveForward() {
+  analogWrite(ENA, motorSpeed); analogWrite(ENB, motorSpeed);
+  digitalWrite(IN1, HIGH); digitalWrite(IN2, LOW);
+  digitalWrite(IN3, HIGH); digitalWrite(IN4, LOW);
+}
+
+void moveBackward() {
+  analogWrite(ENA, motorSpeed); analogWrite(ENB, motorSpeed);
+  digitalWrite(IN1, LOW);  digitalWrite(IN2, HIGH);
+  digitalWrite(IN3, LOW);  digitalWrite(IN4, HIGH);
+}
+
+void turnLeft() {
+  analogWrite(ENA, motorSpeed); analogWrite(ENB, motorSpeed);
+  digitalWrite(IN1, LOW);  digitalWrite(IN2, HIGH);
+  digitalWrite(IN3, HIGH); digitalWrite(IN4, LOW);
+}
+
+void turnRight() {
+  analogWrite(ENA, motorSpeed); analogWrite(ENB, motorSpeed);
+  digitalWrite(IN1, HIGH); digitalWrite(IN2, LOW);
+  digitalWrite(IN3, LOW);  digitalWrite(IN4, HIGH);
+}
+
+void stopMotors() {
+  analogWrite(ENA, 0); analogWrite(ENB, 0);
+  digitalWrite(IN1, LOW); digitalWrite(IN2, LOW);
+  digitalWrite(IN3, LOW); digitalWrite(IN4, LOW);
+}
