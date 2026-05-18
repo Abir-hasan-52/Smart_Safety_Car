@@ -95,19 +95,42 @@ void loop()
                 gasPreviouslyDetected = true;
             }
             stopMotors();
-            gasAlert(); // now non-blocking
+            gasAlert();
             return;
         }
         else
         {
             if (gasPreviouslyDetected)
             {
-                // Gas cleared → resume
+                // Gas cleared - resume
                 BT.println("Gas cleared! Resuming...");
                 gasPreviouslyDetected = false;
                 safeMode();
                 btCommand = 'S'; // wait for next BT command safely
             }
+        }
+        if (irDetect == LOW)
+        {
+            BT.println("IR Obstacle!");
+            autoEscape();
+            return;
+        }
+
+        // ── FIX 4: skip -1 (invalid) readings ──
+        if (distance != -1 && distance < 15)
+        {
+            autoEscape();
+            return;
+        }
+
+        // ── Warning zone ──
+        if (distance != -1 && distance < 30)
+        {
+            warningAlert(); // FIX 1: non-blocking
+        }
+        else
+        {
+            safeMode();
         }
     }
 }
