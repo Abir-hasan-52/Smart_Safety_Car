@@ -116,89 +116,122 @@ void loop()
             return;
         }
 
-        // ── FIX 4: skip -1 (invalid) readings ──
+        //   skip -1 (invalid) readings 
         if (distance != -1 && distance < 15)
         {
             autoEscape();
             return;
         }
 
-        // ── Warning zone ──
+        //  Warning zone 
         if (distance != -1 && distance < 30)
         {
-            warningAlert(); // FIX 1: non-blocking
+            warningAlert();   non-blocking
         }
         else
         {
             safeMode();
         }
     }
+    executeMovement(btCommand);
 }
 
-void autoEscape() {
-  BT.println("OBSTACLE! Escaping...");
+void autoEscape()
+{
+    BT.println("OBSTACLE! Escaping...");
 
-  stopMotors();
-  digitalWrite(LED_RED,   HIGH);
-  digitalWrite(LED_GREEN, LOW);
-  escapeBeep();
-  delay(300);
+    stopMotors();
+    digitalWrite(LED_RED, HIGH);
+    digitalWrite(LED_GREEN, LOW);
+    escapeBeep();
+    delay(300);
 
-  // Reverse
-  BT.println("Reversing...");
-  moveBackward();
-  delay(800);
-  stopMotors();
-  delay(300);
+    // Reverse
+    BT.println("Reversing...");
+    moveBackward();
+    delay(800);
+    stopMotors();
+    delay(300);
 
-  // Try Left
-  BT.println("Trying Left...");
-  turnLeft();
-  delay(600);
-  stopMotors();
-  delay(300);
+    // Try Left
+    BT.println("Trying Left...");
+    turnLeft();
+    delay(600);
+    stopMotors();
+    delay(300);
 
-  long frontDist = getUltrasonicDistance();
-  bool irClear   = digitalRead(IR_FRONT);
+    long frontDist = getUltrasonicDistance();
+    bool irClear = digitalRead(IR_FRONT);
 
-  if ((frontDist > 30 || frontDist == -1) && irClear == HIGH) {
-    BT.println("Left clear! Moving forward.");
-    safeMode();
-    //   only set btCommand if manual override is OFF
-    if (!manualOverride) {
-      btCommand = 'F';
+    if ((frontDist > 30 || frontDist == -1) && irClear == HIGH)
+    {
+        BT.println("Left clear! Moving forward.");
+        safeMode();
+        //   only set btCommand if manual override is OFF
+        if (!manualOverride)
+        {
+            btCommand = 'F';
+        }
+        return;
     }
-    return;
-  }
 
-  // Try Right
-  BT.println("Left blocked! Trying Right...");
-  moveBackward();
-  delay(500);
-  stopMotors();
-  delay(200);
+    // Try Right
+    BT.println("Left blocked! Trying Right...");
+    moveBackward();
+    delay(500);
+    stopMotors();
+    delay(200);
 
-  turnRight();
-  delay(1200);
-  stopMotors();
-  delay(300);
+    turnRight();
+    delay(1200);
+    stopMotors();
+    delay(300);
 
-  frontDist = getUltrasonicDistance();
-  irClear   = digitalRead(IR_FRONT);
+    frontDist = getUltrasonicDistance();
+    irClear = digitalRead(IR_FRONT);
 
-  if ((frontDist > 30 || frontDist == -1) && irClear == HIGH) {
-    BT.println("Right clear! Moving forward.");
-    safeMode();
-    //  only set btCommand if manual override is OFF
-    if (!manualOverride) {
-      btCommand = 'F';
+    if ((frontDist > 30 || frontDist == -1) && irClear == HIGH)
+    {
+        BT.println("Right clear! Moving forward.");
+        safeMode();
+        //  only set btCommand if manual override is OFF
+        if (!manualOverride)
+        {
+            btCommand = 'F';
+        }
+        return;
     }
-    return;
-  }
 
-  // Completely stuck
-  BT.println("Completely stuck! Manual needed.");
-  stopMotors();
-  stuckAlert();
-  btCommand = 'S';
+    // Completely stuck
+    BT.println("Completely stuck! Manual needed.");
+    stopMotors();
+    stuckAlert();
+    btCommand = 'S';
+}
+
+//  BLUETOOTH HANDLER
+
+void handleBluetooth(char cmd)
+{
+    switch (cmd)
+    {
+    case 'H':
+        motorSpeed = 220;
+        BT.println("Speed: HIGH");
+        break;
+    case 'M':
+        motorSpeed = 150;
+        BT.println("Speed: MEDIUM");
+        break;
+    case 'L':
+        motorSpeed = 100;
+        BT.println("Speed: LOW");
+        break;
+    case 'X':
+        manualOverride = !manualOverride;
+        BT.println(manualOverride ? "Override: ON" : "Override: OFF");
+        if (!manualOverride)
+            safeMode();
+        break;
+    }
 }
