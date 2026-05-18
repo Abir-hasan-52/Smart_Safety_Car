@@ -134,3 +134,71 @@ void loop()
         }
     }
 }
+
+void autoEscape() {
+  BT.println("OBSTACLE! Escaping...");
+
+  stopMotors();
+  digitalWrite(LED_RED,   HIGH);
+  digitalWrite(LED_GREEN, LOW);
+  escapeBeep();
+  delay(300);
+
+  // Reverse
+  BT.println("Reversing...");
+  moveBackward();
+  delay(800);
+  stopMotors();
+  delay(300);
+
+  // Try Left
+  BT.println("Trying Left...");
+  turnLeft();
+  delay(600);
+  stopMotors();
+  delay(300);
+
+  long frontDist = getUltrasonicDistance();
+  bool irClear   = digitalRead(IR_FRONT);
+
+  if ((frontDist > 30 || frontDist == -1) && irClear == HIGH) {
+    BT.println("Left clear! Moving forward.");
+    safeMode();
+    //   only set btCommand if manual override is OFF
+    if (!manualOverride) {
+      btCommand = 'F';
+    }
+    return;
+  }
+
+  // Try Right
+  BT.println("Left blocked! Trying Right...");
+  moveBackward();
+  delay(500);
+  stopMotors();
+  delay(200);
+
+  turnRight();
+  delay(1200);
+  stopMotors();
+  delay(300);
+
+  frontDist = getUltrasonicDistance();
+  irClear   = digitalRead(IR_FRONT);
+
+  if ((frontDist > 30 || frontDist == -1) && irClear == HIGH) {
+    BT.println("Right clear! Moving forward.");
+    safeMode();
+    //  only set btCommand if manual override is OFF
+    if (!manualOverride) {
+      btCommand = 'F';
+    }
+    return;
+  }
+
+  // Completely stuck
+  BT.println("Completely stuck! Manual needed.");
+  stopMotors();
+  stuckAlert();
+  btCommand = 'S';
+}
