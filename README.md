@@ -34,13 +34,13 @@ The car operates in two modes:
 
 | Component | Quantity | Purpose |
 |---|---|---|
-| Arduino Uno / Nano | 1 | Main microcontroller |
+| Arduino Uno  | 1 | Main microcontroller |
 | L298N Motor Driver | 1 | Controls 2 DC motors |
-| DC Gear Motors | 2 | Drive the car |
+| DC Gear Motors | 4 | Drive the car |
 | HC-SR04 Ultrasonic Sensor | 1 | Front distance measurement |
 | IR Sensor Module | 1 | Close-range obstacle detection |
 | MQ-2 / MQ-5 Gas Sensor | 1 | Gas / smoke detection |
-| HC-05 / HC-06 Bluetooth Module | 1 | Wireless communication |
+| HC-05 Bluetooth Module | 1 | Wireless communication |
 | Active Buzzer | 1 | Audio alerts |
 | Red LED | 1 | Danger indicator |
 | Green LED | 1 | Safe status indicator |
