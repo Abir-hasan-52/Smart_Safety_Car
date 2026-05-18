@@ -44,7 +44,7 @@ The car operates in two modes:
 | Active Buzzer | 1 | Audio alerts |
 | Red LED | 1 | Danger indicator |
 | Green LED | 1 | Safe status indicator |
-| 7.4V Li-ion Battery / Power Bank | 1 | Power supply |
+| 3.7V Li-ion Battery / Power Bank | 3 | Power supply |
 | Jumper Wires + Chassis | — | Assembly |
 
 ---
