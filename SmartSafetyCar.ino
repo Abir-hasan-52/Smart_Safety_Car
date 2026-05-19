@@ -235,3 +235,125 @@ void handleBluetooth(char cmd)
         break;
     }
 }
+
+
+ 
+//  MOVEMENT
+ 
+void executeMovement(char cmd) {
+  switch (cmd) {
+    case 'F': moveForward();  break;
+    case 'B': moveBackward(); break;
+    case 'L': turnLeft();     break;
+    case 'R': turnRight();    break;
+    case 'S': stopMotors();   break;
+  }
+}
+
+void moveForward() {
+  analogWrite(ENA, motorSpeed); analogWrite(ENB, motorSpeed);
+  digitalWrite(IN1, HIGH); digitalWrite(IN2, LOW);
+  digitalWrite(IN3, HIGH); digitalWrite(IN4, LOW);
+}
+
+void moveBackward() {
+  analogWrite(ENA, motorSpeed); analogWrite(ENB, motorSpeed);
+  digitalWrite(IN1, LOW);  digitalWrite(IN2, HIGH);
+  digitalWrite(IN3, LOW);  digitalWrite(IN4, HIGH);
+}
+
+void turnLeft() {
+  analogWrite(ENA, motorSpeed); analogWrite(ENB, motorSpeed);
+  digitalWrite(IN1, LOW);  digitalWrite(IN2, HIGH);
+  digitalWrite(IN3, HIGH); digitalWrite(IN4, LOW);
+}
+
+void turnRight() {
+  analogWrite(ENA, motorSpeed); analogWrite(ENB, motorSpeed);
+  digitalWrite(IN1, HIGH); digitalWrite(IN2, LOW);
+  digitalWrite(IN3, LOW);  digitalWrite(IN4, HIGH);
+}
+
+void stopMotors() {
+  analogWrite(ENA, 0); analogWrite(ENB, 0);
+  digitalWrite(IN1, LOW); digitalWrite(IN2, LOW);
+  digitalWrite(IN3, LOW); digitalWrite(IN4, LOW);
+}
+
+
+ 
+//   IMPROVED ULTRASONIC
+//  returns -1 if reading is invalid
+ 
+long getUltrasonicDistance() {
+  digitalWrite(TRIG, LOW);  delayMicroseconds(2);
+  digitalWrite(TRIG, HIGH); delayMicroseconds(10);
+  digitalWrite(TRIG, LOW);
+
+  long duration = pulseIn(ECHO, HIGH, 30000);
+
+  // duration == 0 means no echo received
+  if (duration == 0) return -1;
+
+  long distance = duration * 0.034 / 2;
+
+  // Sanity check: HC-SR04 valid range is 2cm – 400cm
+  if (distance < 2 || distance > 400) return -1;
+
+  return distance;
+}
+
+
+ 
+//  ALERTS
+ 
+//  Non-blocking warningAlert using millis()
+void warningAlert() {
+  unsigned long now = millis();
+  digitalWrite(LED_GREEN, LOW);
+
+  if (now - lastWarningTime >= 100) {   // toggle every 100ms
+    lastWarningTime    = now;
+    warningBuzzerState = !warningBuzzerState;
+    digitalWrite(BUZZER,  warningBuzzerState ? HIGH : LOW);
+    digitalWrite(LED_RED, warningBuzzerState ? HIGH : LOW);
+  }
+}
+
+//  Non-blocking gasAlert using millis()
+void gasAlert() {
+  static unsigned long lastGasBuzz = 0;
+  static bool gasBuzzState         = false;
+  unsigned long now                = millis();
+
+  digitalWrite(LED_RED,   HIGH);
+  digitalWrite(LED_GREEN, LOW);
+
+  if (now - lastGasBuzz >= 80) {
+    lastGasBuzz  = now;
+    gasBuzzState = !gasBuzzState;
+    digitalWrite(BUZZER, gasBuzzState ? HIGH : LOW);
+  }
+}
+
+void escapeBeep() {
+  for (int i = 0; i < 3; i++) {
+    digitalWrite(BUZZER, HIGH); delay(120);
+    digitalWrite(BUZZER, LOW);  delay(80);
+  }
+}
+
+void stuckAlert() {
+  for (int i = 0; i < 3; i++) {
+    digitalWrite(BUZZER, HIGH); delay(400);
+    digitalWrite(BUZZER, LOW);  delay(200);
+  }
+  digitalWrite(LED_RED, HIGH);
+}
+
+void safeMode() {
+  digitalWrite(LED_GREEN, HIGH);
+  digitalWrite(LED_RED,   LOW);
+  digitalWrite(BUZZER,    LOW);
+}
+
